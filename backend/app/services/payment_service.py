@@ -41,6 +41,10 @@ def record_payment(db: Session, data: PaymentCreate, actor: User) -> Payment:
         )
     if data.payment_date > date.today():
         raise BusinessRuleError("Payment date cannot be in the future.", fields={"payment_date": "Future date"})
+    if data.payment_date < invoice.invoice_date:
+        raise BusinessRuleError(
+            "Payment date cannot be before the invoice date.", fields={"payment_date": "Before invoice date"}
+        )
     outstanding = invoice.total - invoice.amount_paid
     if data.amount > outstanding:
         raise BusinessRuleError(

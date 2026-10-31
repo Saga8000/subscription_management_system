@@ -108,6 +108,8 @@ def test_partial_full_and_over_payments(staff: TestClient, catalog) -> None:
     assert staff.post("/api/v1/payments", json={**pay, "amount": "-5"}).status_code == 422
     future = (date.today() + timedelta(days=2)).isoformat()
     assert staff.post("/api/v1/payments", json={**pay, "amount": "10", "payment_date": future}).status_code == 422
+    before_invoice = (date.fromisoformat(invoice["invoice_date"]) - timedelta(days=1)).isoformat()
+    assert staff.post("/api/v1/payments", json={**pay, "amount": "10", "payment_date": before_invoice}).status_code == 422
 
     assert staff.post("/api/v1/payments", json={**pay, "amount": "2540"}).status_code == 201
     inv = staff.get(f"/api/v1/invoices/{invoice['id']}").json()

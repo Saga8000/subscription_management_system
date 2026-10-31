@@ -79,19 +79,26 @@ def main() -> None:
     subscribe(initech, monthly, today, [{"product_id": kit["id"], "quantity": "1"}], activate=False)
 
     invoices = []
-    for sub in (acme_sub, globex_sub):
-        for inv in post(f"/subscriptions/{sub['id']}/generate-invoice"):
-            post(f"/invoices/{inv['id']}/confirm")
-            invoices.append(inv)
+    # Simulate billing having run weekly in the past, so invoice/due dates (and overdue balances) look realistic.
+    as_of = today - timedelta(days=95)
+    while as_of <= today:
+        for sub in (acme_sub, globex_sub):
+            r = api.post(f"/api/v1/subscriptions/{sub['id']}/generate-invoice", json={"as_of": as_of.isoformat()})
+            if r.status_code == 422:  # nothing due yet on this date
+                continue
+            for inv in _ok(r):
+                post(f"/invoices/{inv['id']}/confirm")
+                invoices.append(inv)
+        as_of += timedelta(days=7)
 
     acme_invoices = sorted((i for i in invoices if i["customer_id"] == acme["id"]), key=lambda i: i["period_start"])
     if acme_invoices:
         first = acme_invoices[0]
         post("/payments", {"invoice_id": first["id"], "amount": first["total"], "method": "bank_transfer",
-                           "payment_date": (today - timedelta(days=80)).isoformat(), "reference": "NEFT-DEMO-001"})
+                           "payment_date": (date.fromisoformat(first["invoice_date"]) + timedelta(days=5)).isoformat(), "reference": "NEFT-DEMO-001"})
     if len(acme_invoices) > 1:
         post("/payments", {"invoice_id": acme_invoices[1]["id"], "amount": "2000.00", "method": "upi",
-                           "payment_date": (today - timedelta(days=45)).isoformat(), "reference": "UPI-DEMO-002"})
+                           "payment_date": (date.fromisoformat(acme_invoices[1]["invoice_date"]) + timedelta(days=10)).isoformat(), "reference": "UPI-DEMO-002"})
 
     # A sent quotation awaiting the portal customer's response.
     q = post("/quotations", {"customer_id": acme["id"], "plan_id": monthly["id"], "start_date": (today + timedelta(days=7)).isoformat(),
