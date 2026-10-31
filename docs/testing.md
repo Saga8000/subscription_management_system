@@ -42,3 +42,5 @@ It goes through the Vite proxy exactly like the browser: SPA and deep-link servi
 ## Browser verification
 
 A recorded real-browser pass (desktop and a 375px mobile viewport) covered login/logout for all roles, every staff screen, the customer portal, customer creation, quotation → subscription → invoice → payment, billing-run idempotency, payment validation, paid/partial/overdue states, loading and offline-error states, and customer isolation via direct URLs. It found one bug: wide tables overflowed the page on mobile. That is fixed (every table is now in a `.table-wrap` scroll container) and was re-verified. There are no automated frontend/browser tests, so repeat this manually after UI changes.
+
+Evidence in [`media/`](media): the walkthrough video [`brightloop-demo.mp4`](media/brightloop-demo.mp4), the mobile fix re-check [`brightloop-mobile-layout-fix.mp4`](media/brightloop-mobile-layout-fix.mp4), and numbered screenshots (dashboard, customer, subscription, invoice/payment, invoice states, portal, isolation, validation, loading/offline, mobile before/after).

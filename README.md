@@ -13,6 +13,7 @@ A full-stack application that replaces Brightloop's spreadsheet-based subscripti
 ## Demo
 
 - **Video walkthrough:** _VIDEO_URL_PLACEHOLDER_ (replace with the public YouTube/Google Drive link)
+- **In this repo:** [docs/media/brightloop-demo.mp4](docs/media/brightloop-demo.mp4) (3:36) — screenshots in [docs/media](docs/media)
 - Shows: admin login and dashboard, customer creation, quotation → subscription activation, invoice generation and payment recording, customer data isolation and logout.
 
 ## Quick start (Windows)
