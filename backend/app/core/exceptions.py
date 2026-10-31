@@ -57,7 +57,7 @@ def _field_name(loc: tuple[Any, ...]) -> str:
 def register_exception_handlers(app: FastAPI) -> None:
     @app.exception_handler(AppError)
     async def handle_app_error(_: Request, exc: AppError) -> JSONResponse:
-        return JSONResponse(exc.status_code, _error_body(exc.code, exc.message, exc.fields))
+        return JSONResponse(status_code=exc.status_code, content=_error_body(exc.code, exc.message, exc.fields))
 
     @app.exception_handler(RequestValidationError)
     async def handle_validation_error(_: Request, exc: RequestValidationError) -> JSONResponse:
@@ -66,26 +66,26 @@ def register_exception_handlers(app: FastAPI) -> None:
             message = str(err.get("msg", "Invalid value")).removeprefix("Value error, ")
             fields.setdefault(_field_name(tuple(err.get("loc", ()))), message)
         return JSONResponse(
-            status.HTTP_422_UNPROCESSABLE_ENTITY,
-            _error_body("validation_error", "Some fields are invalid.", fields),
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            content=_error_body("validation_error", "Some fields are invalid.", fields),
         )
 
     @app.exception_handler(IntegrityError)
     async def handle_integrity_error(_: Request, exc: IntegrityError) -> JSONResponse:
         logger.warning("Integrity error: %s", exc.orig)
         return JSONResponse(
-            status.HTTP_409_CONFLICT,
-            _error_body("conflict", "The request conflicts with existing data."),
+            status_code=status.HTTP_409_CONFLICT,
+            content=_error_body("conflict", "The request conflicts with existing data."),
         )
 
     @app.exception_handler(StarletteHTTPException)
     async def handle_http_error(_: Request, exc: StarletteHTTPException) -> JSONResponse:
-        return JSONResponse(exc.status_code, _error_body("http_error", str(exc.detail)))
+        return JSONResponse(status_code=exc.status_code, content=_error_body("http_error", str(exc.detail)), headers=getattr(exc, "headers", None))
 
     @app.exception_handler(Exception)
     async def handle_unexpected(_: Request, exc: Exception) -> JSONResponse:
         logger.exception("Unhandled error", exc_info=exc)
         return JSONResponse(
-            status.HTTP_500_INTERNAL_SERVER_ERROR,
-            _error_body("internal_error", "An unexpected error occurred."),
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content=_error_body("internal_error", "An unexpected error occurred."),
         )

@@ -3,7 +3,7 @@
 from datetime import date
 from decimal import Decimal
 
-from sqlalchemy import func, select
+from sqlalchemy import func, literal_column, select
 from sqlalchemy.orm import Session, selectinload
 
 from app.models import Invoice, Payment, Plan, Subscription, SubscriptionLine
@@ -14,6 +14,8 @@ from app.services.pricing import add_months, monthly_equivalent
 from app.utils.money import ZERO, round_money
 
 _BILLED = (InvoiceStatus.CONFIRMED, InvoiceStatus.PAID)
+# Inlined literal: separate bind params in SELECT and GROUP BY are not recognised as the same expression.
+_MONTH_FORMAT = literal_column("'YYYY-MM'")
 
 
 def _money(value: Decimal | None) -> Decimal:
@@ -86,17 +88,17 @@ def monthly_series(db: Session, as_of: date, months: int) -> list[MonthlyPoint]:
     collected = {
         key: value
         for key, value in db.execute(
-            select(func.to_char(Payment.payment_date, "YYYY-MM"), func.sum(Payment.amount))
+            select(func.to_char(Payment.payment_date, _MONTH_FORMAT), func.sum(Payment.amount))
             .where(Payment.payment_date >= first, Payment.payment_date < end)
-            .group_by(func.to_char(Payment.payment_date, "YYYY-MM"))
+            .group_by(func.to_char(Payment.payment_date, _MONTH_FORMAT))
         ).all()
     }
     invoiced = {
         key: value
         for key, value in db.execute(
-            select(func.to_char(Invoice.invoice_date, "YYYY-MM"), func.sum(Invoice.total))
+            select(func.to_char(Invoice.invoice_date, _MONTH_FORMAT), func.sum(Invoice.total))
             .where(Invoice.status.in_(_BILLED), Invoice.invoice_date >= first, Invoice.invoice_date < end)
-            .group_by(func.to_char(Invoice.invoice_date, "YYYY-MM"))
+            .group_by(func.to_char(Invoice.invoice_date, _MONTH_FORMAT))
         ).all()
     }
     points = []
