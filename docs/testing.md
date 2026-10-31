@@ -39,4 +39,6 @@ backend\.venv\Scripts\python scripts\smoke_test.py
 
 It goes through the Vite proxy exactly like the browser: SPA and deep-link serving, Swagger availability, login for all three demo roles, every staff list endpoint, dashboard, role restrictions, idempotent billing run, customer isolation, pending portal quotation, logout revocation. Last verified result: **all 29 checks passed**.
 
-Manual browser click-through of every screen has not been recorded; the smoke check validates the same API calls the screens use.
+## Browser verification
+
+A recorded real-browser pass (desktop and a 375px mobile viewport) covered login/logout for all roles, every staff screen, the customer portal, customer creation, quotation → subscription → invoice → payment, billing-run idempotency, payment validation, paid/partial/overdue states, loading and offline-error states, and customer isolation via direct URLs. It found one bug: wide tables overflowed the page on mobile. That is fixed (every table is now in a `.table-wrap` scroll container) and was re-verified. There are no automated frontend/browser tests, so repeat this manually after UI changes.
