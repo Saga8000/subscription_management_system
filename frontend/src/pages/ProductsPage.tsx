@@ -145,14 +145,14 @@ function VariantsEditor({ product, onClose, onSaved }: { product: Product; onClo
       <ErrorAlert message={error} />
       <div className="muted" style={{ marginBottom: 8 }}>Base price {money(product.sales_price)}. Variant price = base price + extra price.</div>
       {product.variants.length === 0 ? <Empty>No variants yet.</Empty> : (
-        <table>
+        <div className="table-wrap"><table>
           <thead><tr><th>Name</th><th className="num">Extra</th><th className="num">Unit price</th><th>Status</th><th /></tr></thead>
           <tbody>{product.variants.map((v) => (
             <tr key={v.id}><td>{v.name}</td><td className="num">{money(v.extra_price)}</td><td className="num">{money(v.unit_price)}</td>
               <td><StatusBadge status={v.is_active ? "active" : "closed"} text={v.is_active ? "active" : "inactive"} /></td>
               <td><button className="btn btn-sm" onClick={() => toggle(v)}>{v.is_active ? "Deactivate" : "Activate"}</button></td></tr>
           ))}</tbody>
-        </table>
+        </table></div>
       )}
       <form className="form-row" onSubmit={add} style={{ marginTop: 12, alignItems: "end" }}>
         <Field label="Variant name"><input required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} /></Field>

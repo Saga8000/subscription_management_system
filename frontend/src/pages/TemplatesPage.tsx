@@ -19,7 +19,7 @@ export function TemplatesPage() {
       <ErrorAlert message={error} onRetry={reload} />
       <div className="card">
         {loading && !data ? <Loading /> : data && data.length === 0 ? <Empty>No templates yet.</Empty> : data && (
-          <table>
+          <div className="table-wrap"><table>
             <thead><tr><th>Name</th><th>Plan</th><th>Validity</th><th>Lines</th><th>Status</th><th /></tr></thead>
             <tbody>{data.map((t) => (
               <tr key={t.id}><td>{t.name}</td><td>{planName(t.plan_id)}</td><td>{t.validity_days} days</td>
@@ -27,7 +27,7 @@ export function TemplatesPage() {
                 <td><StatusBadge status={t.is_active ? "active" : "closed"} text={t.is_active ? "active" : "inactive"} /></td>
                 <td><button className="btn btn-sm" onClick={() => setEditing(t)}>Edit</button></td></tr>
             ))}</tbody>
-          </table>
+          </table></div>
         )}
       </div>
       {editing && <TemplateForm template={editing === "new" ? null : editing} plans={plans.data ?? []} products={products.data?.items ?? []} onClose={() => setEditing(null)} onSaved={reload} />}

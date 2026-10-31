@@ -117,8 +117,8 @@ export function InvoiceDetailPage() {
       <div className="card">
         <h2>Payments</h2>
         {inv.payments.length === 0 ? <div className="muted">No payments recorded.</div> : (
-          <table><thead><tr><th>Date</th><th>Method</th><th>Reference</th><th className="num">Amount</th></tr></thead>
-            <tbody>{inv.payments.map((p) => <tr key={p.id}><td>{formatDate(p.payment_date)}</td><td>{label(p.method)}</td><td>{p.reference ?? "—"}</td><td className="num">{money(p.amount)}</td></tr>)}</tbody></table>
+          <div className="table-wrap"><table><thead><tr><th>Date</th><th>Method</th><th>Reference</th><th className="num">Amount</th></tr></thead>
+            <tbody>{inv.payments.map((p) => <tr key={p.id}><td>{formatDate(p.payment_date)}</td><td>{label(p.method)}</td><td>{p.reference ?? "—"}</td><td className="num">{money(p.amount)}</td></tr>)}</tbody></table></div>
         )}
       </div>
       {action === "confirm" && <ConfirmDialog title="Confirm invoice?" message="Confirmed invoices are visible to the customer and can receive payments. Lines can no longer change." onConfirm={() => run("confirm", "Invoice confirmed.")} onClose={() => setAction(null)} />}

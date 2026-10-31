@@ -17,14 +17,14 @@ export function TaxesPage() {
       <ErrorAlert message={error} onRetry={reload} />
       <div className="card">
         {loading && !data ? <Loading /> : data && data.length === 0 ? <Empty>No taxes configured.</Empty> : data && (
-          <table>
+          <div className="table-wrap"><table>
             <thead><tr><th>Name</th><th className="num">Rate</th><th>Status</th><th /></tr></thead>
             <tbody>{data.map((t) => (
               <tr key={t.id}><td>{t.name}</td><td className="num">{Number(t.rate_percent)}%</td>
                 <td><StatusBadge status={t.is_active ? "active" : "closed"} text={t.is_active ? "active" : "inactive"} /></td>
                 <td>{isAdmin && <button className="btn btn-sm" onClick={() => setEditing(t)}>Edit</button>}</td></tr>
             ))}</tbody>
-          </table>
+          </table></div>
         )}
       </div>
       {editing && <TaxForm tax={editing === "new" ? null : editing} onClose={() => setEditing(null)} onSaved={reload} />}

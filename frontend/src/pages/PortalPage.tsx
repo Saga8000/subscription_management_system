@@ -42,11 +42,11 @@ export function PortalPage() {
         <h2>My subscriptions</h2>
         <ErrorAlert message={subs.error} onRetry={subs.reload} />
         {subs.loading ? <Loading /> : subs.data && (subs.data.items.length === 0 ? <Empty>No subscriptions yet.</Empty> : (
-          <table><thead><tr><th>Number</th><th>Plan</th><th>Next invoice</th><th className="num">Per period</th><th>Status</th></tr></thead>
+          <div className="table-wrap"><table><thead><tr><th>Number</th><th>Plan</th><th>Next invoice</th><th className="num">Per period</th><th>Status</th></tr></thead>
             <tbody>{subs.data.items.map((s) => (
               <tr key={s.id}><td><Link to={`/subscriptions/${s.id}`}>{s.number}</Link></td><td>{s.plan_name}</td>
                 <td>{s.status === "closed" ? "—" : formatDate(s.next_invoice_date)}</td><td className="num">{money(s.recurring_total)}</td><td><StatusBadge status={s.status} /></td></tr>
-            ))}</tbody></table>
+            ))}</tbody></table></div>
         ))}
       </div>
     </>
